@@ -1,14 +1,18 @@
 # Create your views here.
 from django.shortcuts import render
+#from .models import destination
 from django.http import HttpResponse
 
 
 # Create your views here.
 
 
+def Fashion_Site(request):
+    #val1 = request.POST['Fashion_Site1']
+    return render(request, 'Fashion_Site.html')
+
 def Fashion_Site1(request):
-    val1 = request.POST['Fashion_Site1']
-    return render(request, 'Fashion_Site1.html')
+    return render(request,'Fashion_Site1.html')
 
 
 """ from django.shortcuts import render
@@ -37,7 +41,10 @@ def add1(request):
     val2 = int(request.POST['num2'])
     result1 = val1 + val2
     return render(request,'result.html',{'result1': result1})
+
+def page(request):
+    dest1 = destination()
+    dest1.name = 'Mumbai'
+    return render(request,'index.html', {'dest1': dest1})
 """
-
-
 # Create your views here.
