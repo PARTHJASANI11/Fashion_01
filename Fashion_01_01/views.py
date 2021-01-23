@@ -14,6 +14,13 @@ def Fashion_Site(request):
 def Fashion_Site1(request):
     return render(request,'Fashion_Site1.html')
 
+def Fashion_Site1_URL(request):
+    gender=request.GET['gender']
+    size=request.GET['size']
+    brand=request.GET['brand']
+    Url='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
+    return render(request,'Fashion_Site1_URL.html', {'URL':Url})
+
 
 """ from django.shortcuts import render
 from  django.http import HttpResponse
