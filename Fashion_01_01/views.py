@@ -18,8 +18,30 @@ def Fashion_Site1_URL(request):
     gender=request.GET['gender']
     size=request.GET['size']
     brand=request.GET['brand']
-    Url='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
-    return render(request,'Fashion_Site1_URL.html', {'URL':Url})
+    Url1='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
+    return render(request,'Fashion_Site1_URL.html', {'URL1':Url1})
+
+def Fashion_Site2(request):
+    return render(request,'Fashion_Site2.html')
+
+def Fashion_Site2_URL(request):
+    gender=request.GET['gender']
+    size=request.GET['size']
+    brand=request.GET['brand']
+    color=request.GET['color']
+
+    if(brand != 'Any' or color == 'Any'):
+        Url2 = 'https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})
+    elif (brand == 'Any' or color != 'Any'):
+        Url2 = 'https://www.pantaloons.com/c/' + gender + '/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:' + size + '%7CColor__fq:' + color + '&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})
+    else:
+        Url2='https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Color__fq:'+color+'%7CSizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request,'Fashion_Site2_URL.html', {'URL2': Url2})
+
+def Fashion_Site3(request):
+    return render(request,'Fashion_Site3.html')
 
 
 """ from django.shortcuts import render
