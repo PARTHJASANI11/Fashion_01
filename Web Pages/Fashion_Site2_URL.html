@@ -1,3 +1,4 @@
+{% load index %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,13 @@
     <title>Title</title>
 </head>
 <body>
-<a href={{ Url2 }}> Url </a><br><br>
+
 {% for i in Links2 %}
-    <a href={{ i }}> Click Here </a><br>
+    <a href={{ Links2.forloop.counter }}> Click Here </a><br>
+{% endfor %}
+
+{% for i in Images2 %}
+    <a href={{ Links2|index:forloop.counter0}}> <img src={{ i }}> </a><br>
 {% endfor %}
 
 </body>
