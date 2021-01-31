@@ -1,14 +1,47 @@
 # Create your views here.
 from django.shortcuts import render
+#from .models import destination
 from django.http import HttpResponse
 
 
 # Create your views here.
 
 
+def Fashion_Site(request):
+    #val1 = request.POST['Fashion_Site1']
+    return render(request, 'Fashion_Site.html')
+
 def Fashion_Site1(request):
-    val1 = request.POST['Fashion_Site1']
-    return render(request, 'Fashion_Site1.html')
+    return render(request,'Fashion_Site1.html')
+
+def Fashion_Site1_URL(request):
+    gender=request.GET['gender']
+    size=request.GET['size']
+    brand=request.GET['brand']
+    Url1='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
+    return render(request,'Fashion_Site1_URL.html', {'URL1':Url1})
+
+def Fashion_Site2(request):
+    return render(request,'Fashion_Site2.html')
+
+def Fashion_Site2_URL(request):
+    gender=request.GET['gender']
+    size=request.GET['size']
+    brand=request.GET['brand']
+    color=request.GET['color']
+
+    if(brand != 'Any' or color == 'Any'):
+        Url2 = 'https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})
+    elif (brand == 'Any' or color != 'Any'):
+        Url2 = 'https://www.pantaloons.com/c/' + gender + '/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:' + size + '%7CColor__fq:' + color + '&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})
+    else:
+        Url2='https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Color__fq:'+color+'%7CSizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+        return render(request,'Fashion_Site2_URL.html', {'URL2': Url2})
+
+def Fashion_Site3(request):
+    return render(request,'Fashion_Site3.html')
 
 
 """ from django.shortcuts import render
@@ -37,7 +70,10 @@ def add1(request):
     val2 = int(request.POST['num2'])
     result1 = val1 + val2
     return render(request,'result.html',{'result1': result1})
+
+def page(request):
+    dest1 = destination()
+    dest1.name = 'Mumbai'
+    return render(request,'index.html', {'dest1': dest1})
 """
-
-
 # Create your views here.
