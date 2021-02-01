@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Myntra results</title>
+</head>
+<body>
+{% if url %}
+<a href="{{ url }}" target="_blank">Search result site</a>
+{% endif %}
+<br>
+{% if links_details_dict %}
+    <table><tr>
+    <h2>Results of your search! :)</h2>
+    {% for link, detail in links_details_dict.items %}
+        <td style="padding: 30px;">
+            <a href="{{ link }}" target="_blank"><img src="{{ detail.0 }}" alt="picta" style="height: 280px; width: 210px"></a>
+            <p>{{ detail.1 }}</p><p>Rs. {{ detail.2 }}</p>
+        </td>
+        {% if forloop.counter|divisibleby:3 %}
+            </tr>
+            <tr>
+        {% endif %}
+    {% endfor %}
+    </tr>
+    </table>
+{% endif %}
+</body>
+</html>

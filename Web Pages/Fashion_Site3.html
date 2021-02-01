@@ -5,7 +5,42 @@
     <title>Site3</title>
 </head>
 <body>
-    <h1> Welcome to Site-3! </h1>
+<center>
+<h1> Welcome to Myntra search! </h1>
+<form action="{% url 'search_bar_url' %}" method="post">
+    {% csrf_token %}
+    <input type="text" placeholder="search" name="search">
+    <input type="submit" value="Search">
+</form>
+    <br><br>
+    <form action="{% url 'choice_url' %}" method="post">
+        {% csrf_token %}
+        <b>Filters</b><br>
+        <input type="radio" name="filter" value="Men">Men<br>
+        <input type="radio" name="filter" value="Women">Women<br>
+        <input type="radio" name="filter" value="Boys">Boys<br>
+        <input type="radio" name="filter" value="Girls">Girls<br>
+        <br><br>
+        <b>Categories</b><br>
+        <input type="radio" name="category" value="Tshirts">Tshirts<br>
+        <input type="radio" name="category" value="Jeans">Jeans<br>
+        <input type="radio" name="category" value="Jackets">Jackets<br>
+        <br><br>
+        <b>Brand</b><br>
+        <input type="radio" name="brand" value="Puma">Puma<br>
+        <input type="radio" name="brand" value="Mast and Harbour">Mast and Harbour<br>
+        <input type="radio" name="brand" value="GAP">GAP<br>
+        <input type="radio" name="brand" value="Max">Max<br>
+        <br><br>
+        <b>Color</b><br>
+        <input type="radio" name="color" value="Pink">Pink<br>
+        <input type="radio" name="color" value="Blue">Blue<br>
+        <input type="radio" name="color" value="Black">Black<br>
+        <input type="radio" name="color" value="White">White<br>
+        <br><br>
+        <input type="submit">
+    </form>
 
+    </center>
 </body>
 </html>

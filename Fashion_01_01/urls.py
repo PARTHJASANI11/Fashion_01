@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.conf.urls import url
 
 urlpatterns = [
     # path('', views.home, name='home'),
@@ -8,6 +9,10 @@ urlpatterns = [
     path('Fashion_Site1_URL', views.Fashion_Site1_URL, name='Fashion_Site1_URL'),
     path('Fashion_Site2_URL', views.Fashion_Site2_URL, name='Fashion_Site2_URL'),
     path('Fashion_Site2', views.Fashion_Site2, name='Fashion_Site2'),
+    path('Fashion_Site3', views.Fashion_Site3, name='Fashion_Site3'),
+    url(r'^search_bar/$', views.search_bar_url, name='search_bar_url'),
+    url(r'^search_form/$', views.choice_url, name='choice_url'),
+    url(r'^results/$', views.url_pass, name='url_pass'),
 ]
 
 """from django.urls import path

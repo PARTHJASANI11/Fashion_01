@@ -1,23 +1,23 @@
 # Create your views here.
 from django.shortcuts import render
-#from .models import destination
 from django.http import HttpResponse
-
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import random
-
-
-# Create your views here.
+import urllib.request as urllib
+import urllib3
+import http.cookiejar as cookiejar
+import json
+import re
 
 
 def Fashion_Site(request):
     #val1 = request.POST['Fashion_Site1']
     return render(request, 'Fashion_Site.html')
 
+
 def Fashion_Site1(request):
     return render(request,'Fashion_Site1.html')
+
 
 def Fashion_Site1_URL(request):
     gender=request.GET['gender']
@@ -26,8 +26,10 @@ def Fashion_Site1_URL(request):
     Url1='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
     return render(request,'Fashion_Site1_URL.html', {'URL1':Url1})
 
+
 def Fashion_Site2(request):
     return render(request,'Fashion_Site2.html')
+
 
 def Fashion_Site2_URL(request):
     gender=request.GET['gender']
@@ -81,45 +83,85 @@ def Fashion_Site2_URL(request):
     return render(request,'Fashion_Site2_URL.html', {'Links2': links, 'Images2': images},)
 
 
-
-
-
-
-
 def Fashion_Site3(request):
-    return render(request,'Fashion_Site3.html')
+    return render(request, 'Fashion_Site3.html')
 
 
-""" from django.shortcuts import render
-from  django.http import HttpResponse
-# Create your views here.
+def search_bar_url(request):
+    if request.method == "POST":
+        search_text = request.POST.get('search')
+        search_text.lower()
+        search_words = search_text.split(' ')
+        url = url_pass(search_words)
+        links_details_dict = results_collector(url)
+        return render(request, "myntra_search_results.html", {"url": url, "links_details_dict": links_details_dict})
 
-#def home(request):
- #   return HttpResponse('Hello! I am Parth Jasani. I am ready to learn Django.')
 
-def home1(request):
-    #return HttpResponse('Hello! I am home1.')
-    # return render(request,'hello1.html')
-    #i = input("Enter Your Name:")
-    return render(request,'hello1.html',{'name':'Parth'})
+def choice_url(request):
+    if request.method == "POST":
+        inps = ['filter', 'category', 'brand', 'color']
+        search_words = []
+        for i in inps:
+            try:
+                search_words.append(request.POST.get(i).lower())
+            except AttributeError:
+                pass
+        url = url_pass(search_words)
+        links_details_dict = results_collector(url)
+        return render(request, "myntra_search_results.html", {"url": url, "links_details_dict": links_details_dict})
 
-def add(request):
 
-    val1 = int(request.GET['num1'])
-    val2 = int(request.GET['num2'])
-    result = val1 + val2
-    return render(request,'result.html',{'result': result})
+def url_pass(terms):
+    search_string = ""
+    for i in terms:
+        search_string += i
+        if i != terms[-1]:
+            search_string += "-"
+    url = "https://www.myntra.com/" + search_string
+    return url
 
-def add1(request):
 
-    val1 = int(request.POST['num1'])
-    val2 = int(request.POST['num2'])
-    result1 = val1 + val2
-    return render(request,'result.html',{'result1': result1})
+def results_collector(url):
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('--no-sandbox')
+    opts.add_argument("--headless")
+    opts.add_argument(
+        f'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
+    browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
 
-def page(request):
-    dest1 = destination()
-    dest1.name = 'Mumbai'
-    return render(request,'index.html', {'dest1': dest1})
-"""
-# Create your views here.
+    browser.get(url)
+    soup = BeautifulSoup(browser.page_source, 'html.parser')
+    xyz = soup.find("div", id="mountRoot")
+
+    links = []
+    for one_set in xyz.find_all("li", class_="product-base"):
+        a = one_set.find("a")
+        if a:
+            link = "https://www.myntra.com/" + a.get('href')
+            links.append(link)
+    hdr = {
+        'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'none',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Connection': 'keep-alive'}
+
+    links_details_dict = {}
+    for site in links:
+        http = urllib3.PoolManager()
+        req = urllib.Request(site, headers=hdr)
+
+        cj = cookiejar.CookieJar()
+        opener = urllib.build_opener(urllib.HTTPCookieProcessor(cj))
+
+        response = opener.open(req)
+        content = response.read()
+        response.close()
+
+        page = BeautifulSoup(content, "html.parser")
+        a = page.find_all("script", {"type": "application/ld+json"})
+        a = a[1]
+        a = json.loads(a.string)
+        links_details_dict[site] = [a['image'], a['description'], a['offers']['price']]
+    return links_details_dict
