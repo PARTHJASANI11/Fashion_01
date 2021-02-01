@@ -64,10 +64,21 @@ def Fashion_Site2_URL(request):
             a2 = a1.find("a")
         if a2:
             links.append(a2.get('href'))
+
+    images = []
+    for one_set in re_best.find_all("div", class_="col-lg-4 col-md-4 col-sm-4 col-xs-4 category-list-col"):
+        a1 = one_set.find("div", class_='aspectContainer loadingAnimation')
+        if a1:
+            a2 = a1.find("img")
+
+        if a2:
+            images.append(a2.get('src'))
+
+
     #print(links)
     browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
     # browser.get(links[0])
-    return render(request,'Fashion_Site2_URL.html', {'Links2': links, 'Url2': Url2},)
+    return render(request,'Fashion_Site2_URL.html', {'Links2': links, 'Images2': images},)
 
 
 
