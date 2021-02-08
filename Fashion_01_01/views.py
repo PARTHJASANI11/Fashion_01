@@ -30,16 +30,22 @@ def Fashion_Site1_URL(request):
 def Fashion_Site2(request):
     return render(request,'Fashion_Site2.html')
 
-
-def Fashion_Site2_URL(request):
+def Search_Bar_Site2(request):
+    s=(request.POST.get('search')).split()
+    s1='%20'.join(s)
+    print("link: ",s1)
+    url='https://www.pantaloons.com/c/streamoidsearch?search_query='+s1+'&page=1&orderway=desc&orderby=position'
+    print(url)
+    di=Fashion_Site2_URLS(url)
+    print('dictionary: ',di)
+    return render(request, 'Fashion_Site2_URL.html',{'Links_imgs':di})
+def Choice_Bar_Site2(request):
     gender=request.GET['gender']
     size=request.GET['size']
     brand=request.GET['brand']
     color=request.GET['color']
 
-    opts = webdriver.ChromeOptions()
-    opts.headless = True
-    browser = webdriver.Chrome(options=opts)
+
 
     """if(brand != 'Any' or color == 'Any'):
         Url2 = 'https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
@@ -49,8 +55,17 @@ def Fashion_Site2_URL(request):
         Url2 = 'https://www.pantaloons.com/c/' + gender + '/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:' + size + '%7CColor__fq:' + color + '&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
         return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})"""
 
-    Url2='https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Color__fq:'+color+'%7CSizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
-    browser.get(Url2)
+    url='https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Color__fq:'+color+'%7CSizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
+    di=Fashion_Site2_URLS(url)
+    print("Ans: ",di)
+    return render(request, 'Fashion_Site2_URL.html',{'Links_imgs':di})
+
+def Fashion_Site2_URLS(URL):
+    opts = webdriver.ChromeOptions()
+    opts.headless = True
+    browser = webdriver.Chrome(options=opts)
+
+    browser.get(URL)
     soup = BeautifulSoup(browser.page_source, 'html.parser')
 
     re1 = soup.find('div', class_="container-fluid scroll_head_top")
@@ -75,12 +90,14 @@ def Fashion_Site2_URL(request):
 
         if a2:
             images.append(a2.get('src'))
-
+    di={}
+    for i in range(len(links)):
+        di[links[i]]=images[i]
 
     #print(links)
-    browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
-    # browser.get(links[0])
-    return render(request,'Fashion_Site2_URL.html', {'Links2': links, 'Images2': images},)
+    #browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
+    # browser.get
+    return di
 
 
 def Fashion_Site3(request):

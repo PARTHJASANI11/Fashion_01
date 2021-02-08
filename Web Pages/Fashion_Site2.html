@@ -5,8 +5,13 @@
     <title>Site1</title>
 </head>
 <body>
+<form action="Search_Bar_Site2" method="post">
+    {% csrf_token %}
+    <input type="text" placeholder="search" name="search">
+    <input type="submit" value="Search">
+</form>
     <h1> Welcome to Site-2! </h1>
-    <form action="Fashion_Site2_URL">
+    <form action="Choice_Bar_Site2">
         <h1>select your Gender</h1>
         Man<input type="radio" name="gender" value="men">
         Women<input type="radio" name="gender" value="women">
