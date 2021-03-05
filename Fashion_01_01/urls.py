@@ -13,7 +13,7 @@ urlpatterns = [
     path('Fashion_Site3', views.Fashion_Site3, name='Fashion_Site3'),
     url(r'^search_bar/$', views.search_bar_url, name='search_bar_url'),
     url(r'^search_form/$', views.choice_url, name='choice_url'),
-    url(r'^results/$', views.url_pass, name='url_pass'),
+    url(r'^results/$', views.url_pass_myntra, name='url_pass'),
 ]
 
 """from django.urls import path

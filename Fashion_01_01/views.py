@@ -109,9 +109,15 @@ def search_bar_url(request):
         search_text = request.POST.get('search')
         search_text.lower()
         search_words = search_text.split(' ')
-        url = url_pass(search_words)
-        links_details_dict = results_collector(url)
-        return render(request, "myntra_search_results.html", {"url": url, "links_details_dict": links_details_dict})
+        url_myntra = url_pass_myntra(search_words)
+        links_details_dict_myntra = results_collector_myntra(url_myntra)
+        url_bf = url_pass_bf(search_words)
+        links_details_dict_bf = results_collector_bf(url_bf)
+        all_items = {}
+        all_items.update(links_details_dict_bf)
+        all_items.update(links_details_dict_myntra)
+        return render(request, "myntra_search_results.html", {"url": url_myntra, "url_bf": url_bf,
+                                                              "all_items": all_items})
 
 
 def choice_url(request):
@@ -123,12 +129,15 @@ def choice_url(request):
                 search_words.append(request.POST.get(i).lower())
             except AttributeError:
                 pass
-        url = url_pass(search_words)
-        links_details_dict = results_collector(url)
-        return render(request, "myntra_search_results.html", {"url": url, "links_details_dict": links_details_dict})
+        url_myntra = url_pass_myntra(search_words)
+        links_details_dict_myntra = results_collector_myntra(url_myntra)
+        url_bf = url_pass_bf(search_words)
+        links_details_dict_bf = results_collector_bf(url_bf)
+        all_items = links_details_dict_myntra.update(links_details_dict_bf)
+        return render(request, "myntra_search_results.html",
+                      {"url": url_myntra, "url_bf": url_bf, "all_items": all_items})
 
-
-def url_pass(terms):
+def url_pass_myntra(terms):
     search_string = ""
     for i in terms:
         search_string += i
@@ -138,7 +147,7 @@ def url_pass(terms):
     return url
 
 
-def results_collector(url):
+def results_collector_myntra(url):
     opts = webdriver.ChromeOptions()
     opts.add_argument('--no-sandbox')
     opts.add_argument("--headless")
@@ -181,4 +190,71 @@ def results_collector(url):
         a = a[1]
         a = json.loads(a.string)
         links_details_dict[site] = [a['image'], a['description'], a['offers']['price']]
+    return links_details_dict
+
+
+def url_pass_bf(terms):
+    search_string = ""
+    for i in terms:
+        search_string += i
+        if i != terms[-1]:
+            search_string += "-"
+    url = "https://www.brandfactoryonline.com/" + search_string
+    return url
+
+
+def results_collector_bf(url):
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('--no-sandbox')
+    opts.add_argument("--headless")
+    opts.add_argument(
+        f'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
+    browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
+
+    browser.get(url)
+    soup = BeautifulSoup(browser.page_source, 'html.parser')
+    xyz = soup.find_all("li", class_="imageView")
+    links = []
+
+    for one_set in xyz:
+        a = one_set.find("a")
+        if a:
+            links.append("https://www.brandfactoryonline.com" + a.get('href'))
+
+    hdr = {
+        'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'none',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Connection': 'keep-alive'}
+    links_details_dict = {}
+    for site in links:
+        http = urllib3.PoolManager()
+        req = urllib.Request(site, headers=hdr)
+
+        cj = cookiejar.CookieJar()
+        opener = urllib.build_opener(urllib.HTTPCookieProcessor(cj))
+
+        response = opener.open(req)
+        content = response.read()
+        response.close()
+
+        page = BeautifulSoup(content, "html.parser")
+        img = page.find("div", class_="img-thumb slide-selected")
+        img = img.find("img")
+        img = img.get('src')
+        bn = page.find("div", class_="product-brand-name")
+        bn = bn.contents[1]
+        pn = page.find("div", class_="product-name")
+        pn = pn.contents[0]
+        price = page.find("div", class_="pd-discount-price")
+        if not price:
+            price = page.find("div", class_="pd-price-striked")
+            if not price:
+                price = page.find("span", class_="pd-price")
+        if price:
+            price = price.contents[0]
+            price = price[2:]
+        links_details_dict[site] = [img, bn+" "+pn, price]
     return links_details_dict

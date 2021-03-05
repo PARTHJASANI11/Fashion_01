@@ -6,13 +6,17 @@
 </head>
 <body>
 {% if url %}
-<a href="{{ url }}" target="_blank">Search result site</a>
+<a href="{{ url }}" target="_blank">Myntra</a>
 {% endif %}
 <br>
-{% if links_details_dict %}
+{% if url_bf %}
+<a href="{{ url_bf }}" target="_blank">Brand Factory</a>
+{% endif %}
+<br>
+{% if all_items %}
     <table><tr>
     <h2>Results of your search! :)</h2>
-    {% for link, detail in links_details_dict.items %}
+    {% for link, detail in all_items.items %}
         <td style="padding: 30px;">
             <a href="{{ link }}" target="_blank"><img src="{{ detail.0 }}" alt="picta" style="height: 280px; width: 210px"></a>
             <p>{{ detail.1 }}</p><p>Rs. {{ detail.2 }}</p>
@@ -25,5 +29,6 @@
     </tr>
     </table>
 {% endif %}
+
 </body>
 </html>
