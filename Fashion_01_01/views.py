@@ -7,117 +7,30 @@ import urllib.request as urllib
 import urllib3
 import http.cookiejar as cookiejar
 import json
-import re
 
 
-def Fashion_Site(request):
-    #val1 = request.POST['Fashion_Site1']
-    return render(request, 'Fashion_Site.html')
-
-
-def Fashion_Site1(request):
-    return render(request,'Fashion_Site1.html')
-
-
-def Fashion_Site1_URL(request):
-    gender=request.GET['gender']
-    size=request.GET['size']
-    brand=request.GET['brand']
-    Url1='https://www.westside.com/collections/'+gender+'-t-shirt?pf_t_size='+size+'&pf_t_brands='+brand
-    return render(request,'Fashion_Site1_URL.html', {'URL1':Url1})
-
-
-def Fashion_Site2(request):
-    return render(request,'Fashion_Site2.html')
-
-def Search_Bar_Site2(request):
-    s=(request.POST.get('search')).split()
-    s1='%20'.join(s)
-    print("link: ",s1)
-    url='https://www.pantaloons.com/c/streamoidsearch?search_query='+s1+'&page=1&orderway=desc&orderby=position'
-    print(url)
-    di=Fashion_Site2_URLS(url)
-    print('dictionary: ',di)
-    return render(request, 'Fashion_Site2_URL.html',{'Links_imgs':di})
-def Choice_Bar_Site2(request):
-    gender=request.GET['gender']
-    size=request.GET['size']
-    brand=request.GET['brand']
-    color=request.GET['color']
-
-
-
-    """if(brand != 'Any' or color == 'Any'):
-        Url2 = 'https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
-        #return render(request, 'Fashion_Site2_URL.html', {'Links2': links})
-
-    elif (brand == 'Any' or color != 'Any'):
-        Url2 = 'https://www.pantaloons.com/c/' + gender + '/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Sizes__fq:' + size + '%7CColor__fq:' + color + '&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
-        return render(request, 'Fashion_Site2_URL.html', {'URL2': Url2})"""
-
-    url='https://www.pantaloons.com/c/'+gender+'/t-shirts-188?source=menu&page=1&orderway=desc&orderby=position&fp[]=Color__fq:'+color+'%7CSizes__fq:'+size+'%7CSubbrand__fq:'+brand+'&utm_campaign=pure_brand_exact_ao&utm_medium=cpc'
-    di=Fashion_Site2_URLS(url)
-    print("Ans: ",di)
-    return render(request, 'Fashion_Site2_URL.html',{'Links_imgs':di})
-
-def Fashion_Site2_URLS(URL):
-    opts = webdriver.ChromeOptions()
-    opts.headless = True
-    browser = webdriver.Chrome(options=opts)
-
-    browser.get(URL)
-    soup = BeautifulSoup(browser.page_source, 'html.parser')
-
-    re1 = soup.find('div', class_="container-fluid scroll_head_top")
-    re2 = re1.find('div', class_='row')
-    re3 = re2.find('div', attrs={'class': 'col-lg-9 col-md-9 col-sm-8 col-xs-9 category-list-view'})
-    re4 = re3.find('div', attrs={'class': 'filter_content_wrapper'})
-    re_best = re4.find('div', {'class': 'product_search_content row'})
-
-    links = []
-    for one_set in re_best.find_all("div", class_="col-lg-4 col-md-4 col-sm-4 col-xs-4 category-list-col"):
-        a1 = one_set.find("li", class_='slide')
-        if a1:
-            a2 = a1.find("a")
-        if a2:
-            links.append(a2.get('href'))
-
-    images = []
-    for one_set in re_best.find_all("div", class_="col-lg-4 col-md-4 col-sm-4 col-xs-4 category-list-col"):
-        a1 = one_set.find("div", class_='aspectContainer loadingAnimation')
-        if a1:
-            a2 = a1.find("img")
-
-        if a2:
-            images.append(a2.get('src'))
-    di={}
-    for i in range(len(links)):
-        di[links[i]]=images[i]
-
-    #print(links)
-    #browser = webdriver.Chrome(executable_path='chromedriver.exe', options=opts)
-    # browser.get
-    return di
-
-
-def Fashion_Site3(request):
-    return render(request, 'Fashion_Site3.html')
+def search_page(request):
+    return render(request, 'search_page.html')
 
 
 def search_bar_url(request):
     if request.method == "POST":
         search_text = request.POST.get('search')
+        if not search_text:
+            return render(request, 'search_page.html', {"msg": "Hey! Enter something atleast!"})
         search_text.lower()
         search_words = search_text.split(' ')
         url_myntra = url_pass_myntra(search_words)
         links_details_dict_myntra = results_collector_myntra(url_myntra)
         url_bf = url_pass_bf(search_words)
         links_details_dict_bf = results_collector_bf(url_bf)
+        url_pl = url_pass_pl(search_words)
+        links_details_dict_pl = results_collector_pl(url_pl)
         all_items = {}
         all_items.update(links_details_dict_bf)
         all_items.update(links_details_dict_myntra)
-        return render(request, "myntra_search_results.html", {"url": url_myntra, "url_bf": url_bf,
-                                                              "all_items": all_items})
+        all_items.update(links_details_dict_pl)
+        return render(request, "myntra_search_results.html", {"all_items": all_items})
 
 
 def choice_url(request):
@@ -129,13 +42,20 @@ def choice_url(request):
                 search_words.append(request.POST.get(i).lower())
             except AttributeError:
                 pass
+        if not search_words:
+            return render(request, 'search_page.html', {"msg": "Don't simply press submit! First select a radio button!"})
         url_myntra = url_pass_myntra(search_words)
         links_details_dict_myntra = results_collector_myntra(url_myntra)
         url_bf = url_pass_bf(search_words)
         links_details_dict_bf = results_collector_bf(url_bf)
-        all_items = links_details_dict_myntra.update(links_details_dict_bf)
-        return render(request, "myntra_search_results.html",
-                      {"url": url_myntra, "url_bf": url_bf, "all_items": all_items})
+        url_pl = url_pass_pl(search_words)
+        links_details_dict_pl = results_collector_pl(url_pl)
+        all_items = {}
+        all_items.update(links_details_dict_bf)
+        all_items.update(links_details_dict_myntra)
+        all_items.update(links_details_dict_pl)
+        return render(request, "myntra_search_results.html", {"all_items": all_items})
+
 
 def url_pass_myntra(terms):
     search_string = ""
@@ -258,3 +178,50 @@ def results_collector_bf(url):
             price = price[2:]
         links_details_dict[site] = [img, bn+" "+pn, price]
     return links_details_dict
+
+
+def url_pass_pl(terms):
+    search_string = ""
+    for i in terms:
+        search_string += i
+        if i != terms[-1]:
+            search_string += "+"
+    url = "https://www.pantaloons.com/c/streamoidsearch?search_query=" + search_string + "&page=1&orderway=desc&orderby=position"
+    return url
+
+
+def results_collector_pl(URL):
+    opts = webdriver.ChromeOptions()
+    opts.headless = True
+    browser = webdriver.Chrome(options=opts)
+
+    browser.get(URL)
+    soup = BeautifulSoup(browser.page_source, 'html.parser')
+
+    re1 = soup.find('div', class_="container-fluid scroll_head_top")
+    re2 = re1.find('div', class_='row')
+    re3 = re2.find('div', attrs={'class': 'col-lg-9 col-md-9 col-sm-8 col-xs-9 category-list-view'})
+    re4 = re3.find('div', attrs={'class': 'filter_content_wrapper'})
+    re_best = re4.find('div', {'class': 'product_search_content row'})
+
+    links = []
+    for one_set in re_best.find_all("div", class_="col-lg-4 col-md-4 col-sm-4 col-xs-4 category-list-col"):
+        a1 = one_set.find("li", class_='slide')
+        if a1:
+            a2 = a1.find("a")
+        if a2:
+            links.append(a2.get('href'))
+
+    images = []
+    for one_set in re_best.find_all("div", class_="col-lg-4 col-md-4 col-sm-4 col-xs-4 category-list-col"):
+        a1 = one_set.find("div", class_='aspectContainer loadingAnimation')
+        if a1:
+            a2 = a1.find("img")
+
+        if a2:
+            images.append(a2.get('src'))
+    di={}
+    for i in range(len(links)):
+        di[links[i]] = [images[i], "Description", "Price"]
+
+    return di

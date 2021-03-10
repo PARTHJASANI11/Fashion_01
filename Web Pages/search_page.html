@@ -1,16 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+<div id="grad1">
 <head>
+    <style>
+    #grad1 {
+      background-color: red; /* For browsers that do not support gradients */
+      background-image: linear-gradient(#E4D9FF, #FAFAFF);
+    }
+    .form-submit-button {
+    background: #004EFF;
+    color: #fff;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px #eee;
+    text-shadow:none;
+    }
+
+    .form-submit-button:hover {
+    background: #ADD8E6;
+    color: #fff;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px #eee;
+    text-shadow:none;
+    }
+    </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>Site3</title>
+    <title>Search Page</title>
 </head>
 <body>
 <center>
-<h1> Welcome to Myntra search! </h1>
+<h1 style="font-family: 'Indie Flower', cursive;"> Welcome to Fashion Bazaar search! </h1>
+    {% if msg %}
+        {{ msg }}
+    {% endif %}
+<br><br>
 <form action="{% url 'search_bar_url' %}" method="post">
     {% csrf_token %}
-    <input type="text" placeholder="search" name="search">
-    <input type="submit" value="Search">
+    <input type="text" placeholder="search" name="search" style="font-family: 'Indie Flower', cursive;">
+    <input type="submit" value="Search" class="form-submit-button">
 </form>
     <br><br>
     <form action="{% url 'choice_url' %}" method="post">
@@ -38,9 +68,10 @@
         <input type="radio" name="color" value="Black">Black<br>
         <input type="radio" name="color" value="White">White<br>
         <br><br>
-        <input type="submit">
+        <input type="submit" class="form-submit-button">
     </form>
 
     </center>
 </body>
+    </div>
 </html>
